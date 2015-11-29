@@ -235,6 +235,5 @@ function (kalpana_add_example)
    set_property(TARGET ${EXAMPLE_NAME} PROPERTY FOLDER "DO Kalpana Examples")
    set_target_properties(
      ${EXAMPLE_NAME} PROPERTIES
-     COMPILE_FLAGS ${SARA_DEFINITIONS}
      RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 endfunction ()

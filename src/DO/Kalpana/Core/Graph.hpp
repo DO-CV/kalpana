@@ -1,25 +1,41 @@
 #ifndef DO_KALPANA_CORE_GRAPH_HPP
 #define DO_KALPANA_CORE_GRAPH_HPP
 
+#include <QGraphicsItem>
+
 #include <DO/Sara/Core/EigenExtension.hpp>
 
 
 namespace DO { namespace Kalpana {
 
-  struct Marker
-  {
-    char style;
-    int size;
-  };
+  using namespace Eigen;
 
-  struct Point
+  class Graph : public QGraphicsPolygonItem
   {
-    Marker marker;
-  };
+  public:
+    Graph(const QPolygonF& points)
+      : QGraphicsPolygonItem{ points }
+    {
+    }
 
-  class Graph
-  {
-    QVector<QPointF> lines;
+    Graph(const VectorXd& X, const VectorXd& Y, const QPen& pen = QPen{})
+      : QGraphicsPolygonItem{}
+      , m_pen{ pen }
+    {
+      m_pen.setCosmetic(true);
+
+      auto poly = QPolygonF(X.size());
+      for (int i = 0; i < X.size(); ++i)
+        poly[i] = QPointF{ X[i], Y[i] };
+
+      setPolygon(std::move(poly));
+    }
+
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
+               QWidget *widget);
+
+  private:
+    QPen m_pen;
   };
 
 } /* namespace Kalpana */

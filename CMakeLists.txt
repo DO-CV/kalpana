@@ -21,21 +21,13 @@ set(BUILD_SHARED_LIBS ${KALPANA_BUILD_SHARED_LIBS})
 
 # ============================================================================ #
 # State the list of dependencies.
-if (WIN32)
-  set(DO_Sara_DIR "C:/Program Files/DO-Sara/include/DO/Sara")
-else ()
-  set(DO_Sara_DIR /usr/include/DO/Sara)
-endif ()
 list(APPEND CMAKE_MODULE_PATH
-  ${DO_Sara_DIR}/cmake
   ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
-
-# Find third-party libraries.
-find_package(DO_Sara COMPONENTS Core Graphics REQUIRED)
 
 # Use custom CMake macros.
 set(DO_Kalpana_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 set(DO_Kalpana_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/DO/Kalpana)
+include(kalpana_configure_cxx_compiler)
 include(kalpana_macros)
 
 # ============================================================================ #
