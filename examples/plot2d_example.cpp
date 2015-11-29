@@ -1,9 +1,6 @@
 #include <QApplication>
 
-#include <DO/Sara/Core/EigenExtension.hpp>
-
-#include <DO/Kalpana/Core.hpp>
-#include <DO/Kalpana/Plot.hpp>
+#include <DO/Kalpana.hpp>
 
 
 int main(int argc, char **argv)
@@ -12,9 +9,10 @@ int main(int argc, char **argv)
 
   QApplication app{ argc, argv };
 
-  auto X = np::linspace(0, 100, 500);
+  auto X = np::linspace(0, 10, 50);
 
   auto ax = new Canvas{};
+  ax->resize(320, 240);
   ax->plot(X, np::sin(X), plt::style(Qt::red, 5., "--"));
   ax->plot(X, np::cos(X), plt::style(Qt::blue, 5., "-"));
 

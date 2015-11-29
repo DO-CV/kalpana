@@ -1,3 +1,4 @@
+#include <QtDebug>
 #include <QtOpenGL>
 
 #include <DO/Kalpana/Core.hpp>
@@ -12,6 +13,7 @@ namespace DO { namespace Kalpana {
     setTransformationAnchor(AnchorUnderMouse);
     setRenderHints(QPainter::Antialiasing);
     setDragMode(RubberBandDrag);
+    setMouseTracking(true);
 
     setScene(new QGraphicsScene);
   }
@@ -39,6 +41,11 @@ namespace DO { namespace Kalpana {
 
   void Canvas::mouseMoveEvent(QMouseEvent *event)
   {
+    auto point = mapToScene(event->pos());
+    qDebug() << "Canvas size" << size();
+    qDebug() << "view coordinates" << event->pos();
+    qDebug() << "scene coordinates" << point;
+
     QGraphicsView::mouseMoveEvent(event);
   }
 
