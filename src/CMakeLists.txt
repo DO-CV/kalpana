@@ -1,6 +1,7 @@
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
+find_package(GLEW REQUIRED)
 find_package(Qt5 COMPONENTS Core Widgets OpenGL REQUIRED)
 
 if (Qt5_POSITION_INDEPENDENT_CODE)
@@ -26,6 +27,7 @@ foreach (library ${DO_Kalpana_LIBRARIES})
 
   if (NOT ${library} STREQUAL "Plot")
     target_link_libraries(DO_Kalpana_${library}
-      Qt5::Core Qt5::Widgets Qt5::OpenGL)
+      Qt5::Core Qt5::Widgets Qt5::OpenGL
+      ${GLEW_LIBRARIES})
   endif ()
 endforeach ()

@@ -9,6 +9,10 @@
 // you can obtain one at http://mozilla.org/MPL/2.0/.
 // ========================================================================== //
 
+#include <stdexcept>
+
+#include <GL/glew.h>
+
 #ifdef __APPLE__
 # include <OpenGL/GLU.h>
 #else
@@ -17,14 +21,19 @@
 
 #include <QtOpenGL>
 
-#include <DO/Kalpana/3D/Canvas.hpp>
+#include <DO/Kalpana/3D.hpp>
 
 #ifndef GL_MULTISAMPLE
 # define GL_MULTISAMPLE  0x809D
 #endif
 
 
+using namespace std;
+
+
 namespace DO { namespace Kalpana {
+
+  bool Canvas3D::m_initGlew = false;
 
   Canvas3D::Canvas3D(QWidget* parent)
     : QGLWidget(QGLFormat(QGL::SampleBuffers), parent)
@@ -32,6 +41,15 @@ namespace DO { namespace Kalpana {
     , m_backgroundColor(QColor::fromCmykF(0.39, 0.39, 0.0, 0.0))
     , m_color(QColor::fromCmykF(0.40, 0.0, 1.0, 0.0))
   {
+    if (!m_initGlew)
+    {
+      const auto err = glewInit();
+      if (GLEW_OK != err)
+        throw std::runtime_error{ "Failed to initialize GLEW!" };
+      else
+        m_initGlew = true;
+    }
+
     setAttribute(Qt::WA_DeleteOnClose);
 
     // Needed to correctly mix OpenGL commands and QPainter drawing commands.
@@ -40,6 +58,11 @@ namespace DO { namespace Kalpana {
     m_displayFrame = false;
 
     show();
+  }
+
+  void Canvas3D::scatter(const vector<Vector3f>& points)
+  {
+    m_scene._objects.push_back(std::move(new Histogram{ points }));
   }
 
   void Canvas3D::initializeGL()
@@ -101,12 +124,13 @@ namespace DO { namespace Kalpana {
     // Model-view transform.
     glLoadIdentity();
     glTranslatef(0.0f, 0.0f, -15.0f);
-    // Display the world frame is at z=-15 w.r.t. the camera frame.
-    //frame_.draw(5, 0.1);
+
+    // The world frame is at z=-15 w.r.t. the camera frame.
+    //
     // Scale the model
     glScalef(m_scale, m_scale, m_scale);
     // Rotate the model with the trackball.
-    QMatrix4x4 m;
+    auto m = QMatrix4x4{};
     m.rotate(m_trackball.rotation());
     multMatrix(m);
     // Display the mesh.
@@ -115,9 +139,11 @@ namespace DO { namespace Kalpana {
       // Center the model
       glTranslatef(-m_center.x(), -m_center.y(), -m_center.z());
       // Draw the model
-      // displayMesh()
+      for (const auto& object : m_scene._objects)
+        object->draw();
     }
     glPopMatrix();
+
     // Object-centered frame.
     if (m_displayFrame)
       m_frame.draw(5, 0.1);
@@ -125,33 +151,36 @@ namespace DO { namespace Kalpana {
     // Disable the following to properly display the drawing with QPainter.
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-    // Start drawing the text information on the window.
-    QPainter p(this);
-    // Rendering options
+
+    // ====================================================================== //
+    // Display text overlay.
+    QPainter p{ this };
     p.setRenderHint(QPainter::Antialiasing);
     p.setRenderHint(QPainter::TextAntialiasing);
-    // The text to display.
+
     QString text = tr(
       "Use the mouse wheel to zoom and the mouse left button to rotate the scene.\n"
       "Hit 'F' to toggle object-centered frame display");
     // Set the font style
     setFont(QFont("Helvetica [Cronyx]", 10, QFont::Bold));
+
     // Draw the bounding box within which the text will be drawn.
     QFontMetrics metrics = QFontMetrics(font());
-    int border = qMax(4, metrics.leading());
+    const auto border = qMax(4, metrics.leading());
     QRect rect = metrics.boundingRect(
       0, 0, width() - 2*border, int(height()*0.125),
       Qt::AlignCenter | Qt::TextWordWrap, text);
     p.fillRect(QRect(0, 0, width(), rect.height() + 2*border),
-      QColor(0, 0, 0, 127));
+               QColor(0, 0, 0, 127));
+
     // Draw the text.
     p.setPen(Qt::white);
     p.fillRect(QRect(0, 0, width(), rect.height() + 2*border),
-      QColor(0, 0, 0, 127));
+               QColor(0, 0, 0, 127));
     p.setFont(font());
     p.drawText((width() - rect.width())/2, border,
-      rect.width(), rect.height(),
-      Qt::AlignCenter | Qt::TextWordWrap, text);
+               rect.width(), rect.height(),
+               Qt::AlignCenter | Qt::TextWordWrap, text);
     p.end();
   }
 

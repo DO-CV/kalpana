@@ -1,8 +1,10 @@
 #pragma once
 
+#include <memory>
 #include <vector>
 
 #include <DO/Kalpana/3D.hpp>
+
 
 namespace DO { namespace Kalpana {
 
@@ -11,7 +13,7 @@ namespace DO { namespace Kalpana {
   public:
     Scene() = default;
 
-    std::vector<Object3D> _objects;
+    std::vector<std::unique_ptr<Object3D>> _objects;
   };
 
 } /* namespace Kalpana */

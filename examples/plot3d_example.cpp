@@ -5,15 +5,20 @@
 
 int main(int argc, char **argv)
 {
+  using namespace std;
   using namespace DO::Kalpana;
 
   QApplication app{ argc, argv };
 
-  auto X = np::linspace(-6.28, 6.28, 50);
+  vector<Vector3f> points;
+  for (int i = 0; i < 10; ++i)
+    points.push_back(Vector3f(i, i, i));
 
-  auto ax = new Canvas3D{};
-  ax->resize(320, 240);
+  Canvas3D ax{};
+  ax.scatter(points);
 
-  ax->show();
+  ax.resize(320, 240);
+  ax.show();
+
   return app.exec();
 }

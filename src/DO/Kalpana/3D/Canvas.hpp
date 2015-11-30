@@ -19,6 +19,7 @@
 #include <Eigen/Core>
 
 #include <DO/Kalpana/3D/Frame.hpp>
+#include <DO/Kalpana/3D/Scene.hpp>
 #include <DO/Kalpana/3D/TrackBall.hpp>
 
 
@@ -32,6 +33,8 @@ namespace DO { namespace Kalpana {
   public:
     Canvas3D(QWidget* parent = 0);
 
+    void scatter(const std::vector<Vector3f>& points);
+
   protected:
     void initializeGL();
 
@@ -40,7 +43,9 @@ namespace DO { namespace Kalpana {
     void resizeGL(int width, int height);
 
     void mousePressEvent(QMouseEvent *event);
+
     void mouseReleaseEvent(QMouseEvent *event);
+
     void mouseMoveEvent(QMouseEvent *event);
 
     void wheelEvent(QWheelEvent *event);
@@ -53,16 +58,27 @@ namespace DO { namespace Kalpana {
     QPointF normalizePos(const QPointF& localPos) const;
 
   private:
+    //! Modelview parameters.
     GLfloat m_scale;
     Vector3f m_center;
+
+    //! World coordinate frame.
     Frame m_frame;
-    TrackBall m_trackball;
-
-    QPoint m_lastPos;
-    QColor m_backgroundColor;
-    QColor m_color;;
-
     bool m_displayFrame;
+
+    //! The scene
+    Scene m_scene;
+
+    //! Trackball parameters for mouse-based navigation.
+    TrackBall m_trackball;
+    QPoint m_lastPos;
+
+    //! Rendering parameters.
+    QColor m_backgroundColor;
+    QColor m_color;
+
+    //! OpenGL extension wrangler.
+    static bool m_initGlew;
   };
 
 } /* namespace Kalpana */

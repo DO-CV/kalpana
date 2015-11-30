@@ -10,31 +10,26 @@ namespace DO { namespace Kalpana {
   class Object3D
   {
   public:
-    virtual void draw() = 0;
+    virtual ~Object3D();
+
+    virtual void draw() const = 0;
   };
 
-  class Vertex : public Object3D
-  {
-  public:
-    void draw() override;
-
-  private:
-    Vector3f _pos;
-    Vector3f _col;
-    float _sz;
-  };
 
   class Histogram : public Object3D
   {
   public:
     Histogram() = default;
 
-    void draw() override;
+    Histogram(const std::vector<Vector3f>& points);
+
+    void draw() const override;
 
   private:
-    std::vector<Vertex> _bins;
-  }
-
+    std::vector<Vector3f> _pos;
+    std::vector<Vector3f> _col;
+    std::vector<float> _sz;
+  };
 
 } /* namespace Kalpana */
 } /* namespace DO */
