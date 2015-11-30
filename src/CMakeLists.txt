@@ -18,11 +18,14 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 
 # Create the following libraries.
-set(DO_Kalpana_LIBRARIES Core)
+set(DO_Kalpana_LIBRARIES 2D 3D Plot)
 foreach (library ${DO_Kalpana_LIBRARIES})
   kalpana_glob_directory(${DO_Kalpana_SOURCE_DIR}/${library})
   kalpana_create_common_variables("${library}")
   kalpana_generate_library("${library}")
-  target_link_libraries(DO_Kalpana_${library}
-    Qt5::Core Qt5::Widgets Qt5::OpenGL)
+
+  if (NOT ${library} STREQUAL "Plot")
+    target_link_libraries(DO_Kalpana_${library}
+      Qt5::Core Qt5::Widgets Qt5::OpenGL)
+  endif ()
 endforeach ()

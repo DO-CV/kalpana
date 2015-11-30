@@ -1,9 +1,9 @@
-#ifndef DO_KALPANA_CORE_GRAPH_HPP
-#define DO_KALPANA_CORE_GRAPH_HPP
+#ifndef DO_KALPANA_2D_GRAPH_HPP
+#define DO_KALPANA_2D_GRAPH_HPP
 
 #include <QGraphicsItem>
 
-#include <DO/Sara/Core/EigenExtension.hpp>
+#include <Eigen/Core>
 
 
 namespace DO { namespace Kalpana {
@@ -26,7 +26,7 @@ namespace DO { namespace Kalpana {
 
       auto poly = QPolygonF(X.size());
       for (int i = 0; i < X.size(); ++i)
-        poly[i] = QPointF{ X[i], Y[i] };
+        poly[i] = QPointF{ X[i], -Y[i] };
 
       setPolygon(std::move(poly));
     }
@@ -42,4 +42,4 @@ namespace DO { namespace Kalpana {
 } /* namespace DO */
 
 
-#endif /* DO_KALPANA_CORE_GRAPH_HPP */
+#endif /* DO_KALPANA_2D_GRAPH_HPP */

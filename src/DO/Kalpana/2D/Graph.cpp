@@ -1,6 +1,6 @@
-#include <DO/Kalpana/Core.hpp>
-
 #include <QGraphicsItem>
+
+#include <DO/Kalpana/2D.hpp>
 
 
 namespace DO { namespace Kalpana {

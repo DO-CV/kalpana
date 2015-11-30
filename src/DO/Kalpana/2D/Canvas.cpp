@@ -1,7 +1,7 @@
 #include <QtDebug>
 #include <QtOpenGL>
 
-#include <DO/Kalpana/Core.hpp>
+#include <DO/Kalpana/2D.hpp>
 
 
 namespace DO { namespace Kalpana {
@@ -24,9 +24,25 @@ namespace DO { namespace Kalpana {
     fitInView(sceneRect());
   }
 
-  void Canvas::scaleView(qreal scaleFactor)
+  void Canvas::drawForeground(QPainter *painter, const QRectF& rect)
   {
-    scale(scaleFactor, scaleFactor);
+    Q_UNUSED(rect);
+
+    painter->resetTransform();
+    const auto w = viewport()->width();
+    const auto h = viewport()->height();
+
+    const auto padding = QPoint{ 20, 20 };
+    painter->drawRect(QRectF{ padding, QPoint{ w, h } - padding });
+  }
+
+  void Canvas::keyPressEvent(QKeyEvent *event)
+  {
+    // Adjust view.
+    if (event->key() == Qt::Key_F)
+      fitInView(sceneRect());
+
+    QGraphicsView::keyPressEvent(event);
   }
 
   void Canvas::mousePressEvent(QMouseEvent *event)
@@ -56,13 +72,15 @@ namespace DO { namespace Kalpana {
     QGraphicsView::wheelEvent(event);
   }
 
-  void Canvas::keyPressEvent(QKeyEvent *event)
+  void Canvas::resizeEvent(QResizeEvent *event)
   {
-    // Adjust view.
-    if (event->key() == Qt::Key_F)
-      fitInView(sceneRect());
-
-    QGraphicsView::keyPressEvent(event);
+    QGraphicsView::resizeEvent(event);
   }
+
+  void Canvas::scaleView(qreal scaleFactor)
+  {
+    scale(scaleFactor, scaleFactor);
+  }
+
 } /* namespace Kalpana */
 } /* namespace DO */
