@@ -41,15 +41,6 @@ namespace DO { namespace Kalpana {
     , m_backgroundColor(QColor::fromCmykF(0.39, 0.39, 0.0, 0.0))
     , m_color(QColor::fromCmykF(0.40, 0.0, 1.0, 0.0))
   {
-    if (!m_initGlew)
-    {
-      const auto err = glewInit();
-      if (GLEW_OK != err)
-        throw std::runtime_error{ "Failed to initialize GLEW!" };
-      else
-        m_initGlew = true;
-    }
-
     setAttribute(Qt::WA_DeleteOnClose);
 
     // Needed to correctly mix OpenGL commands and QPainter drawing commands.
@@ -62,11 +53,21 @@ namespace DO { namespace Kalpana {
 
   void Canvas3D::scatter(const vector<Vector3f>& points)
   {
-    m_scene._objects.push_back(std::move(new Histogram{ points }));
+    unique_ptr<SceneItem> histogram{ new Histogram{ points } };
+    m_scene._objects.push_back(std::move(histogram));
   }
 
   void Canvas3D::initializeGL()
   {
+    if (!m_initGlew)
+    {
+      const auto err = glewInit();
+      if (GLEW_OK != err)
+        throw std::runtime_error{ "Failed to initialize GLEW!" };
+      else
+        m_initGlew = true;
+    }
+
     // Set background color
     qglClearColor(m_backgroundColor);
 

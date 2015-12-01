@@ -11,7 +11,7 @@ int main(int argc, char **argv)
   QApplication app{ argc, argv };
 
   vector<Vector3f> points;
-  for (int i = 0; i < 10; ++i)
+  for (int i = -10; i < 10; ++i)
     points.push_back(Vector3f(i, i, i));
 
   Canvas3D ax{};

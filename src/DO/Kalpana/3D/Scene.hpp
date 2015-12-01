@@ -3,7 +3,7 @@
 #include <memory>
 #include <vector>
 
-#include <DO/Kalpana/3D.hpp>
+#include <DO/Kalpana/3D/SceneItem.hpp>
 
 
 namespace DO { namespace Kalpana {
@@ -13,7 +13,7 @@ namespace DO { namespace Kalpana {
   public:
     Scene() = default;
 
-    std::vector<std::unique_ptr<Object3D>> _objects;
+    std::vector<std::unique_ptr<SceneItem>> _objects;
   };
 
 } /* namespace Kalpana */
