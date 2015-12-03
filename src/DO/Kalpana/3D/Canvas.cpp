@@ -53,7 +53,9 @@ namespace DO { namespace Kalpana {
 
   PointCloud *Canvas3D::scatter(const vector<Vector3f>& points)
   {
-    unique_ptr<SceneItem> point_cloud{ new PointCloud{ points } };
+    auto colors = vector<Vector3f>(points.size(), Vector3f::Ones());
+    auto sizes = vector<float>(points.size(), 5.f);
+    unique_ptr<SceneItem> point_cloud{ new PointCloud{ points, colors, sizes } };
     m_scene._objects.push_back(std::move(point_cloud));
     return dynamic_cast<PointCloud *>(m_scene._objects.back().get());
   }

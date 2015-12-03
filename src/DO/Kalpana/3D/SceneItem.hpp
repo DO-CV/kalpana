@@ -2,8 +2,11 @@
 
 #include <vector>
 
+#include <GL/gl.h>
+
 #include <Eigen/Core>
 
+#include <DO/Kalpana/3D/Shader.hpp>
 #include <DO/Kalpana/3D.hpp>
 
 
@@ -11,17 +14,12 @@ namespace DO { namespace Kalpana {
 
   using namespace Eigen;
 
-  class Shader;
-  class ShaderProgram;
-
   class SceneItem
   {
   public:
     SceneItem() = default;
 
-    virtual ~SceneItem()
-    {
-    }
+    virtual ~SceneItem() {}
 
     virtual void draw() const = 0;
 
@@ -30,43 +28,45 @@ namespace DO { namespace Kalpana {
 
   class PointCloud : public SceneItem
   {
+    struct Vertex
+    {
+      Vector3f point;
+      Vector3f color;
+      float size;
+    };
+
   public:
-    PointCloud() = default;
+    PointCloud();
 
-    PointCloud(const std::vector<Vector3f>& points);
+    PointCloud(const std::vector<Vector3f>& points,
+               const std::vector<Vector3f>& colors,
+               const std::vector<float>& sz);
 
-    PointCloud(PointCloud&& other)
-      : _pos{ std::move(other._pos) }
-      , _col{ std::move(other._col) }
-      , _sz{ std::move(other._sz) }
-    {
-    }
-
-    ~PointCloud()
-    {
-    }
+    ~PointCloud();
 
     void set_vertex_shader_source(const std::string& source);
 
-    void set_framgment_shader_source(const std::string& source);
+    void set_fragment_shader_source(const std::string& source);
 
-    void initialize_shaders() const;
+    void initialize_shaders();
 
     void draw() const override;
 
   private:
+    //! @brief Vertex data in host memory.
+    std::vector<Vertex> _vertices;
+
     //! @{
-    //! @brief Vertices.
-    std::vector<Vector3f> _pos;
-    std::vector<Vector3f> _col;
-    std::vector<float> _sz;
+    //! @brief Vertex data in device memory.
+    GLuint _vbo = { 0 };
+    GLuint _vao = { 0 };
     //! @}
 
     //! @{
     //! @brief Rendering properties
-    Shader *_vertex_shader{ nullptr };
-    Shader *_fragment_shader{ nullptr };
-    ShaderProgram *_shader_program{ nullptr };
+    Shader _vertex_shader;
+    Shader _fragment_shader;
+    ShaderProgram _shader_program;
     //! @}
   };
 

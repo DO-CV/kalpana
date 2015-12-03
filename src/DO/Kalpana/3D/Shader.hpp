@@ -1,7 +1,6 @@
 #pragma once
 
 #include <string>
-#include <unordered_set>
 
 #include <GL/gl.h>
 
@@ -28,9 +27,6 @@ namespace DO { namespace Kalpana {
     GLenum _shader_type;
     GLuint _shader_object{ 0 };
     std::string _shader_source;
-
-    // Shader management.
-    static std::unordered_set<std::string> _shader_sources;
   };
 
   class ShaderProgram
@@ -59,9 +55,6 @@ namespace DO { namespace Kalpana {
     GLuint _program_object{ 0 };
     GLuint _vertex_shader{ 0 };
     GLuint _fragment_shader{ 0 };
-
-    // Shader program management.
-    //static std::vector<GLuint> _shader_programs;
   };
 
 } /* namespace Kalpana */

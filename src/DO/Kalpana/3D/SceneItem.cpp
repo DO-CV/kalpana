@@ -1,9 +1,10 @@
+#define GL_GLEXT_PROTOTYPES
+
 #include <iostream>
 
-#include <GL/glew.h>
+#include <GL/gl.h>
 
 #include <DO/Kalpana/3D.hpp>
-#include <DO/Kalpana/Stringize.hpp>
 
 
 using namespace std;
@@ -11,27 +12,55 @@ using namespace std;
 
 namespace DO { namespace Kalpana {
 
-  PointCloud::PointCloud(const vector<Vector3f>& points)
-    : _pos{ points }
+  PointCloud::PointCloud()
   {
-    _col.resize(points.size());
-    fill(_col.begin(), _col.end(), Vector3f::Ones());
-
-    _sz.resize(points.size());
-    fill(_sz.begin(), _sz.end(), 2.f);
+    glGenBuffers(1, &_vbo);
+    glGenVertexArrays(1, &_vao);
   }
 
-  void PointCloud::set_vertex_shader_source(const std::string& source)
+  PointCloud::PointCloud(const vector<Vector3f>& points,
+                         const vector<Vector3f>& colors,
+                         const vector<float>& point_sizes)
+    : PointCloud{}
   {
-    _vertex_shader.create_from_source(source);
+    _vertices.resize(points.size());
+    for (size_t i = 0; i != _vertices.size(); ++i)
+      _vertices[i] = { points[i], colors[i], point_sizes[i] };
+
+    // Allocate the VBO with the appropriate size.
+    glBindBuffer(GL_ARRAY_BUFFER, _vbo);
+    glBufferData(GL_ARRAY_BUFFER, _vertices.size() * sizeof(Vertex), nullptr,
+                 GL_STATIC_DRAW);
+
+    glBindVertexArray(_vao);
+    // layout(location = 0) in vec3 position;
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
+                          reinterpret_cast<void *>(offsetof(Vertex, point)));
+    // layout(location = 1) in vec3 color;
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
+                          reinterpret_cast<void *>(offsetof(Vertex, color)));
+    // layout(location = 2) in float point_size;
+    glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, sizeof(Vertex),
+                          reinterpret_cast<void *>(offsetof(Vertex, size)));
   }
 
-  void PointCloud::set_framgment_shader_source(const std::string& source)
+  PointCloud::~PointCloud()
   {
-    _fragment_shader.create_from_source(source);
+    glDeleteBuffers(1, &_vbo);
+    glDeleteVertexArrays(1, &_vao);
   }
 
-  void PointCloud::initialize_shaders() const
+  void PointCloud::set_vertex_shader_source(const string& source)
+  {
+    _vertex_shader.create_from_source(GL_VERTEX_SHADER, source);
+  }
+
+  void PointCloud::set_fragment_shader_source(const string& source)
+  {
+    _fragment_shader.create_from_source(GL_FRAGMENT_SHADER, source);
+  }
+
+  void PointCloud::initialize_shaders()
   {
     _shader_program.attach(_vertex_shader, _fragment_shader);
     _shader_program.use();
@@ -39,19 +68,11 @@ namespace DO { namespace Kalpana {
 
   void PointCloud::draw() const
   {
-    const auto *pos_arr = reinterpret_cast<const float *>(_pos.data());
-    const auto *col_arr = reinterpret_cast<const float *>(_col.data());
-
-    glEnableClientState(GL_VERTEX_ARRAY);
-    glEnableClientState(GL_COLOR_ARRAY);
-    glPointSize(5.);
-    {
-      glVertexPointer(3, GL_FLOAT, 0, pos_arr);
-      glColorPointer(3, GL_FLOAT, 0, col_arr);
-      glDrawArrays(GL_POINTS, 0, _pos.size());
-    }
-    glDisableClientState(GL_VERTEX_ARRAY);
-    glDisableClientState(GL_COLOR_ARRAY);
+    glBindBuffer(GL_ARRAY_BUFFER, _vbo);
+    glEnableVertexAttribArray(0);
+    glEnableVertexAttribArray(1);
+    glEnableVertexAttribArray(2);
+    glDrawElements(GL_POINTS, _vertices.size(), GL_UNSIGNED_INT, nullptr);
   }
 
 } /* namespace Kalpana */
