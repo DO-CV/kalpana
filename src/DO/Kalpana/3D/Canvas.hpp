@@ -20,6 +20,7 @@
 
 #include <DO/Kalpana/3D/Frame.hpp>
 #include <DO/Kalpana/3D/Scene.hpp>
+#include <DO/Kalpana/3D/SceneItem.hpp>
 #include <DO/Kalpana/3D/TrackBall.hpp>
 
 
@@ -33,7 +34,7 @@ namespace DO { namespace Kalpana {
   public:
     Canvas3D(QWidget* parent = 0);
 
-    void scatter(const std::vector<Vector3f>& points);
+    PointCloud * scatter(const std::vector<Vector3f>& points);
 
   protected:
     void initializeGL();

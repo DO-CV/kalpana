@@ -50,6 +50,7 @@ flags = [
 "-I", "/usr/include/x86_64-linux-gnu/qt5/QtGui",
 "-I", "/usr/include/x86_64-linux-gnu/qt5/QtNetwork",
 "-I", "/usr/include/x86_64-linux-gnu/qt5/QtOpenGL",
+"-I", "/usr/include/x86_64-linux-gnu/qt5/QtOpenGLExtensions",
 "-I", "/usr/include/x86_64-linux-gnu/qt5/QtQuick",
 "-I", "/usr/include/x86_64-linux-gnu/qt5/QtQml",
 "-I", "/usr/include/x86_64-linux-gnu/qt5/QtTest",

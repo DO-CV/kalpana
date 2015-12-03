@@ -51,10 +51,11 @@ namespace DO { namespace Kalpana {
     show();
   }
 
-  void Canvas3D::scatter(const vector<Vector3f>& points)
+  PointCloud *Canvas3D::scatter(const vector<Vector3f>& points)
   {
-    unique_ptr<SceneItem> histogram{ new Histogram{ points } };
-    m_scene._objects.push_back(std::move(histogram));
+    unique_ptr<SceneItem> point_cloud{ new PointCloud{ points } };
+    m_scene._objects.push_back(std::move(point_cloud));
+    return dynamic_cast<PointCloud *>(m_scene._objects.back().get());
   }
 
   void Canvas3D::initializeGL()
