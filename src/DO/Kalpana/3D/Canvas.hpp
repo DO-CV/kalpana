@@ -77,9 +77,6 @@ namespace DO { namespace Kalpana {
     //! Rendering parameters.
     QColor m_backgroundColor;
     QColor m_color;
-
-    //! OpenGL extension wrangler.
-    static bool m_initGlew;
   };
 
 } /* namespace Kalpana */

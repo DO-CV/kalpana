@@ -11,7 +11,9 @@
 
 #include <stdexcept>
 
-#include <GL/glew.h>
+#ifdef _WIN32
+# include <windows.h>
+#endif
 
 #ifdef __APPLE__
 # include <OpenGL/GLU.h>
@@ -32,8 +34,6 @@ using namespace std;
 
 
 namespace DO { namespace Kalpana {
-
-  bool Canvas3D::m_initGlew = false;
 
   Canvas3D::Canvas3D(QWidget* parent)
     : QGLWidget(QGLFormat(QGL::SampleBuffers), parent)
@@ -62,15 +62,6 @@ namespace DO { namespace Kalpana {
 
   void Canvas3D::initializeGL()
   {
-    if (!m_initGlew)
-    {
-      const auto err = glewInit();
-      if (GLEW_OK != err)
-        throw std::runtime_error{ "Failed to initialize GLEW!" };
-      else
-        m_initGlew = true;
-    }
-
     // Set background color
     qglClearColor(m_backgroundColor);
 

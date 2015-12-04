@@ -1,8 +1,7 @@
-#define GL_GLEXT_PROTOTYPES
-
 #include <iostream>
 
-#include <GL/gl.h>
+#include <QtOpenGL>
+#include <QtOpenGLExtensions>
 
 #include <DO/Kalpana/3D.hpp>
 

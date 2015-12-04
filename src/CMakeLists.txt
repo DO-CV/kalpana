@@ -1,13 +1,14 @@
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-find_package(GLEW REQUIRED)
-find_package(Qt5 COMPONENTS Core Widgets OpenGL REQUIRED)
+find_package(Qt5 COMPONENTS Core Widgets OpenGL OpenGLExtensions REQUIRED)
 find_package(DO_Sara COMPONENTS Core REQUIRED)
 
 if (Qt5_POSITION_INDEPENDENT_CODE)
   set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 endif()
+
+add_definitions(-DGL_GLEXT_PROTOTYPES)
 
 
 kalpana_dissect_version(${DO_Kalpana_VERSION})
@@ -28,8 +29,7 @@ foreach (library ${DO_Kalpana_LIBRARIES})
 
   if (NOT ${library} STREQUAL "Plot")
     target_link_libraries(DO_Kalpana_${library}
-      Qt5::Core Qt5::Widgets Qt5::OpenGL
-      ${GLEW_LIBRARIES}
+      Qt5::Core Qt5::Widgets Qt5::OpenGL Qt5::OpenGLExtensions
       ${DO_Sara_LIBRARIES})
   endif ()
 endforeach ()

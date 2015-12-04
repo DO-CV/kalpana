@@ -21,15 +21,23 @@ set(BUILD_SHARED_LIBS ${KALPANA_BUILD_SHARED_LIBS})
 
 # ============================================================================ #
 # State the list of dependencies.
-list(APPEND CMAKE_MODULE_PATH
-  ${CMAKE_CURRENT_SOURCE_DIR}/cmake
-  /usr/include/DO/Sara/cmake)
+if (WIN32)
+  set(DO_Sara_DIR "C:/Program Files/DO-Sara")
+else ()
+  set(DO_Sara_DIR /usr/include)
+endif ()
 
-# Use custom CMake macros.
 set(DO_Kalpana_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 set(DO_Kalpana_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/DO/Kalpana)
+
+list(APPEND CMAKE_MODULE_PATH
+  ${CMAKE_CURRENT_SOURCE_DIR}/cmake
+  ${DO_Sara_DIR}/include/DO/Sara/cmake)
+
+# Use custom CMake macros.
 include(kalpana_configure_cxx_compiler)
 include(kalpana_macros)
+
 
 # ============================================================================ #
 # Build the following directories.

@@ -1,9 +1,5 @@
-#define GL_GLEXT_PROTOTYPES
-
 #include <fstream>
 #include <stdexcept>
-
-#include <GL/gl.h>
 
 #include <DO/Sara/Core/StringFormat.hpp>
 
