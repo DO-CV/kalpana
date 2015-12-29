@@ -1,9 +1,13 @@
 #include <fstream>
+#include <iostream>
 #include <stdexcept>
 
 #include <DO/Sara/Core/StringFormat.hpp>
 
 #include <DO/Kalpana/3D.hpp>
+
+
+using namespace std;
 
 
 namespace DO { namespace Kalpana {
@@ -20,9 +24,8 @@ namespace DO { namespace Kalpana {
     _shader_type = shader_type;
     _shader_object = glCreateShader(shader_type);
 
-    _shader_source = source;
-    auto shader_src_data = reinterpret_cast<const GLchar *>(_shader_source.data());
-    auto shader_src_sz = static_cast<GLint>(_shader_source.size());
+    auto shader_src_data = reinterpret_cast<const GLchar *>(source.data());
+    auto shader_src_sz = static_cast<GLint>(source.size());
 
     glShaderSource(_shader_object, 1, &shader_src_data, &shader_src_sz);
     glCompileShader(_shader_object);
@@ -31,22 +34,22 @@ namespace DO { namespace Kalpana {
     auto success = GLint{};
     auto log_max_sz = GLint{ 0 };
     auto log_sz = GLsizei{ 0 };
-    auto log = std::string{};
+    auto log = string{};
 
     glGetShaderiv(_shader_object, GL_COMPILE_STATUS, &success);
     if (!success)
     {
       glGetShaderiv(_shader_object, GL_INFO_LOG_LENGTH, &log_max_sz);
-      if (log_sz > 1)
-      {
-        log.resize(log_max_sz);
-        glGetShaderInfoLog(_shader_object, log_max_sz, &log_sz, &log[0]);
-        log.resize(log_sz);
-      }
+      log.resize(log_max_sz);
+      glGetShaderInfoLog(_shader_object, log_max_sz, &log_sz, &log[0]);
+      log.resize(log_sz);
 
-      throw std::runtime_error{
-        Sara::format("Error: failed to create program from source:\n%s.\n"
-                     "Compilation log:\n%s", source.c_str(), log.c_str())
+      throw runtime_error{
+        Sara::format("Error: failed to create shader from source:\n"
+                     "%s.\n"
+                     "Compilation log:\n"
+                     "%s",
+                     source.c_str(), log.c_str())
       };
     }
   }
@@ -74,28 +77,18 @@ namespace DO { namespace Kalpana {
   void Shader::clear()
   {
     if (_shader_object)
+    {
       glDeleteShader(_shader_object);
 
-    auto success = GLint{};
-    glGetShaderiv(_shader_object, GL_DELETE_STATUS, &success);
-    if (!success)
-      throw std::runtime_error{
+      auto success = GLint{};
+      glGetShaderiv(_shader_object, GL_DELETE_STATUS, &success);
+      if (!success)
+        throw std::runtime_error{
         Sara::format("Error: failed to delete shader: %d.", success)
       };
 
-    _shader_object = 0;
-  }
-
-  ShaderProgram::ShaderProgram()
-  {
-    create();
-  }
-
-  ShaderProgram::ShaderProgram(const Shader& vertex_shader,
-                               const Shader& fragment_shader)
-    : ShaderProgram{}
-  {
-    attach(vertex_shader, fragment_shader);
+      _shader_object = 0;
+    }
   }
 
   ShaderProgram::~ShaderProgram()
@@ -107,6 +100,8 @@ namespace DO { namespace Kalpana {
   void ShaderProgram::attach(const Shader& vertex_shader,
                              const Shader& fragment_shader)
   {
+    create();
+
     glAttachShader(_program_object, vertex_shader);
     glAttachShader(_program_object, fragment_shader);
 
@@ -161,7 +156,7 @@ namespace DO { namespace Kalpana {
     }
   }
 
-  void ShaderProgram::use(bool on)
+  void ShaderProgram::use(bool on) const
   {
     if (on)
       glUseProgram(_program_object);
@@ -171,11 +166,11 @@ namespace DO { namespace Kalpana {
 
   void ShaderProgram::create()
   {
-    if (_program_object)
+    if (!_program_object)
       _program_object = glCreateProgram();
 
     if (!_program_object)
-      throw std::runtime_error{ "Failed to create program!" };
+      throw std::runtime_error{ "Failed to create shader program!" };
   }
 
   void ShaderProgram::clear()
@@ -206,8 +201,9 @@ namespace DO { namespace Kalpana {
             success, log.data())
         };
       }
+
+      _program_object = 0;
     }
-    _program_object = 0;
   }
 
 } /* namespace Kalpana */

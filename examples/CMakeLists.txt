@@ -18,7 +18,6 @@ foreach (file ${examples_SRC_FILES})
   kalpana_add_example(${filename} ${file})
   target_link_libraries(
     ${filename}
-    DO_Kalpana_2D DO_Kalpana_3D
-	${OPENGL_LIBRARIES}
+    DO_Kalpana_2D DO_Kalpana_3D DO_Kalpana_Math
     Qt5::Widgets Qt5::OpenGL Qt5::OpenGLExtensions)
 endforeach()

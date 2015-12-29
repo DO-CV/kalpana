@@ -9,25 +9,14 @@
 // you can obtain one at http://mozilla.org/MPL/2.0/.
 // ========================================================================== //
 
+#include <iostream>
 #include <stdexcept>
 
-#ifdef _WIN32
-# include <windows.h>
-#endif
-
-#ifdef __APPLE__
-# include <OpenGL/GLU.h>
-#else
-# include <GL/glu.h>
-#endif
-
 #include <QtOpenGL>
+#include <QtOpenGLExtensions>
 
 #include <DO/Kalpana/3D.hpp>
-
-#ifndef GL_MULTISAMPLE
-# define GL_MULTISAMPLE  0x809D
-#endif
+#include <DO/Kalpana/Math/Projection.hpp>
 
 
 using namespace std;
@@ -35,35 +24,19 @@ using namespace std;
 
 namespace DO { namespace Kalpana {
 
-  Canvas3D::Canvas3D(QWidget* parent)
-    : QGLWidget(QGLFormat(QGL::SampleBuffers), parent)
-    , m_scale(1.0f)
-    , m_backgroundColor(QColor::fromCmykF(0.39, 0.39, 0.0, 0.0))
-    , m_color(QColor::fromCmykF(0.40, 0.0, 1.0, 0.0))
+  Canvas3D::Canvas3D(Scene *scene, QWidget* parent)
+    : QOpenGLWidget{ parent }
+    , m_scene{ scene }
   {
     setAttribute(Qt::WA_DeleteOnClose);
-
-    // Needed to correctly mix OpenGL commands and QPainter drawing commands.
     setAutoFillBackground(false);
-
-    m_displayFrame = false;
-
-    show();
-  }
-
-  PointCloud *Canvas3D::scatter(const vector<Vector3f>& points)
-  {
-    auto colors = vector<Vector3f>(points.size(), Vector3f::Ones());
-    auto sizes = vector<float>(points.size(), 5.f);
-    unique_ptr<SceneItem> point_cloud{ new PointCloud{ points, colors, sizes } };
-    m_scene._objects.push_back(std::move(point_cloud));
-    return dynamic_cast<PointCloud *>(m_scene._objects.back().get());
   }
 
   void Canvas3D::initializeGL()
   {
     // Set background color
-    qglClearColor(m_backgroundColor);
+    glClearColor(m_backgroundColor[0], m_backgroundColor[1],
+                 m_backgroundColor[2], m_backgroundColor[3]);
 
     glShadeModel(GL_SMOOTH);  // Enable smooth shading
 
@@ -94,6 +67,9 @@ namespace DO { namespace Kalpana {
 
     // Normalize the vector for the lighting
     glEnable(GL_NORMALIZE);
+
+    for (auto& scene_item : m_scene->_objects)
+      scene_item->initialize();
   }
 
   static void multMatrix(const QMatrix4x4& m)
@@ -106,15 +82,16 @@ namespace DO { namespace Kalpana {
     glMultMatrixf(mat);
   }
 
-  void Canvas3D::paintEvent(QPaintEvent *)
+  void Canvas3D::render3DScene()
   {
     makeCurrent();
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // Setup the viewing mode for the mesh
-    glPolygonMode(GL_FRONT, GL_FILL); // we make each front face filled
-    glPolygonMode(GL_BACK, GL_LINE);  // we draw only the edges of the back face
-    glEnable(GL_DEPTH_TEST);  // For depth consistent drawing
+    glPolygonMode(GL_FRONT, GL_FILL);
+    glPolygonMode(GL_BACK, GL_LINE);
+    glEnable(GL_DEPTH_TEST);
 
     // Model-view transform.
     glLoadIdentity();
@@ -133,8 +110,9 @@ namespace DO { namespace Kalpana {
     {
       // Center the model
       glTranslatef(-m_center.x(), -m_center.y(), -m_center.z());
+
       // Draw the model
-      for (const auto& object : m_scene._objects)
+      for (const auto& object : m_scene->_objects)
         object->draw();
     }
     glPopMatrix();
@@ -145,17 +123,17 @@ namespace DO { namespace Kalpana {
 
     // Disable the following to properly display the drawing with QPainter.
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+  }
 
-
-    // ====================================================================== //
-    // Display text overlay.
+  void Canvas3D::renderTextOverlay()
+  {
     QPainter p{ this };
-    p.setRenderHint(QPainter::Antialiasing);
-    p.setRenderHint(QPainter::TextAntialiasing);
+    p.setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing);
 
     QString text = tr(
-      "Use the mouse wheel to zoom and the mouse left button to rotate the scene.\n"
-      "Hit 'F' to toggle object-centered frame display");
+      "Use the mouse wheel to zoom and the mouse left button to rotate the "
+      "scene.\nHit 'F' to toggle object-centered frame display");
+
     // Set the font style
     setFont(QFont("Helvetica [Cronyx]", 10, QFont::Bold));
 
@@ -179,21 +157,27 @@ namespace DO { namespace Kalpana {
     p.end();
   }
 
-  void Canvas3D::resizeGL(int width, int height)
+  void Canvas3D::paintEvent(QPaintEvent *)
   {
-    glViewport(0, 0, width, height);
+    render3DScene();
+    renderTextOverlay();
+  }
+
+  void Canvas3D::resizeGL(int w, int h)
+  {
+    glViewport(0, 0, w, h);
 
     glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    const auto ratio = width/static_cast<double>(height);
-    gluPerspective(60.0, ratio, 1.0, 100.0);
+    const auto ratio = double(w) / h;
+    const auto proj_matrix = perspective(60., ratio, 1., 100.);
+    glLoadMatrixd(proj_matrix.data());
 
     glMatrixMode(GL_MODELVIEW);
   }
 
   QPointF Canvas3D::normalizePos(const QPointF& localPos) const
   {
-    QPointF pos(localPos);
+    auto pos = localPos;
     pos.rx() -=  width()/2.; pos.rx() /= width()/2.;
     pos.ry() -= height()/2.; pos.ry() /= height()/2.; pos.ry() *= -1;
     return pos;
@@ -201,12 +185,13 @@ namespace DO { namespace Kalpana {
 
   void Canvas3D::mousePressEvent(QMouseEvent *event)
   {
-    QGLWidget::mousePressEvent(event);
+    QOpenGLWidget::mousePressEvent(event);
     if (event->isAccepted())
       return;
 
-    QPointF pos(normalizePos(event->localPos()));
-    if (event->buttons() & Qt::LeftButton) {
+    auto pos = normalizePos(event->localPos());
+    if (event->buttons() & Qt::LeftButton)
+    {
       m_trackball.push(pos, m_trackball.rotation());
       event->accept();
     }
@@ -215,12 +200,13 @@ namespace DO { namespace Kalpana {
 
   void Canvas3D::mouseReleaseEvent(QMouseEvent *event)
   {
-    QGLWidget::mouseReleaseEvent(event);
+    QOpenGLWidget::mouseReleaseEvent(event);
     if (event->isAccepted())
       return;
 
-    QPointF pos(normalizePos(event->localPos()));
-    if (event->button() == Qt::LeftButton) {
+    auto pos = normalizePos(event->localPos());
+    if (event->button() == Qt::LeftButton)
+    {
       m_trackball.release(pos);
       event->accept();
     }
@@ -229,28 +215,30 @@ namespace DO { namespace Kalpana {
 
   void Canvas3D::mouseMoveEvent(QMouseEvent *event)
   {
-    QGLWidget::mouseMoveEvent(event);
+    QOpenGLWidget::mouseMoveEvent(event);
     if (event->isAccepted())
     {
       qDebug() << "mouse move event already accepted";
       return;
     }
 
-    QPointF pos(normalizePos(event->localPos()));
-    if (event->buttons() & Qt::LeftButton) {
+    auto pos = normalizePos(event->localPos());
+    if (event->buttons() & Qt::LeftButton)
+    {
       m_trackball.move(pos);
       event->accept();
-    } else {
-      m_trackball.release(pos);
     }
+    else
+      m_trackball.release(pos);
     update();
   }
 
   void Canvas3D::wheelEvent(QWheelEvent* event)
   {
-    QGLWidget::wheelEvent(event);
+    QOpenGLWidget::wheelEvent(event);
 
-    if (!event->isAccepted()) {
+    if (!event->isAccepted())
+    {
       event->delta() > 0 ? m_scale += 0.05f*m_scale : m_scale -= 0.05f*m_scale;
       update();
     }

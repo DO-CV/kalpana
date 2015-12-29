@@ -24,7 +24,7 @@ set(BUILD_SHARED_LIBS ${KALPANA_BUILD_SHARED_LIBS})
 if (WIN32)
   set(DO_Sara_DIR "C:/Program Files/DO-Sara")
 else ()
-  set(DO_Sara_DIR /usr/include)
+  set(DO_Sara_DIR /usr)
 endif ()
 
 set(DO_Kalpana_DIR ${CMAKE_CURRENT_SOURCE_DIR})

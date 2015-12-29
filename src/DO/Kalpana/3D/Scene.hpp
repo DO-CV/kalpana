@@ -13,7 +13,9 @@ namespace DO { namespace Kalpana {
   public:
     Scene() = default;
 
-    std::vector<std::unique_ptr<SceneItem>> _objects;
+    PointCloud * scatter(const std::vector<Vector3f>& points);
+
+    std::vector<std::unique_ptr<SceneItem>> _objects{};
   };
 
 } /* namespace Kalpana */

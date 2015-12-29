@@ -11,10 +11,10 @@
 
 //! @file
 
-#ifndef DO_KALPANA_GRAPHICS_OPENGLWINDOW_HPP
-#define DO_KALPANA_GRAPHICS_OPENGLWINDOW_HPP
+#ifndef DO_KALPANA_3D_CANVAS_HPP
+#define DO_KALPANA_3D_CANVAS_HPP
 
-#include <QGLWidget>
+#include <QOpenGLWidget>
 
 #include <Eigen/Core>
 
@@ -29,24 +29,22 @@ namespace DO { namespace Kalpana {
   using namespace Eigen;
 
   //! @brief QGLWidget-derived class used to view 3D scenes.
-  class Canvas3D : public QGLWidget
+  class Canvas3D : public QOpenGLWidget
   {
   public:
-    Canvas3D(QWidget* parent = 0);
+    Canvas3D(Scene *scene, QWidget* parent = 0);
 
-    PointCloud * scatter(const std::vector<Vector3f>& points);
+    void render3DScene();
+    void renderTextOverlay();
 
   protected:
     void initializeGL();
+    void resizeGL(int width, int height);
 
     void paintEvent(QPaintEvent *event);
 
-    void resizeGL(int width, int height);
-
     void mousePressEvent(QMouseEvent *event);
-
     void mouseReleaseEvent(QMouseEvent *event);
-
     void mouseMoveEvent(QMouseEvent *event);
 
     void wheelEvent(QWheelEvent *event);
@@ -60,27 +58,26 @@ namespace DO { namespace Kalpana {
 
   private:
     //! Modelview parameters.
-    GLfloat m_scale;
+    GLfloat m_scale{ 1.0f };
     Vector3f m_center;
 
     //! World coordinate frame.
     Frame m_frame;
-    bool m_displayFrame;
+    bool m_displayFrame{ false };
 
     //! The scene
-    Scene m_scene;
+    Scene *m_scene;
 
     //! Trackball parameters for mouse-based navigation.
     TrackBall m_trackball;
     QPoint m_lastPos;
 
     //! Rendering parameters.
-    QColor m_backgroundColor;
-    QColor m_color;
+    Vector4f m_backgroundColor{ 0.72f, 0.655f, 0.886f, 1.0f };
   };
 
 } /* namespace Kalpana */
 } /* namespace DO */
 
 
-#endif /* DO_KALPANA_GRAPHICS_OPENGLWINDOW_HPP */
+#endif /* DO_KALPANA_3D_CANVAS_HPP */

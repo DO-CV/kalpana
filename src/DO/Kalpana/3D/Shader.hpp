@@ -26,13 +26,12 @@ namespace DO { namespace Kalpana {
   private:
     GLenum _shader_type;
     GLuint _shader_object{ 0 };
-    std::string _shader_source;
   };
 
   class ShaderProgram
   {
   public:
-    ShaderProgram();
+    ShaderProgram() = default;
 
     ShaderProgram(const Shader& vertex_shader, const Shader& fragment_shader);
 
@@ -44,7 +43,7 @@ namespace DO { namespace Kalpana {
 
     void detach();
 
-    void use(bool on = true);
+    void use(bool on = true) const;
 
   protected:
     void create();
