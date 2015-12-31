@@ -35,7 +35,7 @@ int main(int argc, char **argv)
     {
       gl_Position = proj_mat * modelview_mat * vec4(position, 1.0);
       //gl_Color = vec4(color, 1.0);
-      //gl_PointSize = size;
+      gl_PointSize = abs(position[2]);
     })" };
 
   auto fragment_shader = string{ R"(

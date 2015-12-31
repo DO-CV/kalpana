@@ -66,49 +66,48 @@ namespace DO { namespace Kalpana {
     glGenBuffers(1, &_vbo);
     glGenVertexArrays(1, &_vao);
 
-    // Allocate the VBO with the appropriate size.
+    // Copy the vertex data to the VBO.
     glBindBuffer(GL_ARRAY_BUFFER, _vbo);
     glBufferData(GL_ARRAY_BUFFER, _vertices.size() * sizeof(Vertex),
                  reinterpret_cast<void *>(_vertices.data()),
                  GL_STATIC_DRAW);
-
-    glBindVertexArray(_vao);
-    // layout(location = 0) in vec3 position;
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
-                          reinterpret_cast<void *>(offsetof(Vertex, point)));
-    // layout(location = 1) in vec3 color;
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
-                          reinterpret_cast<void *>(offsetof(Vertex, color)));
-    // layout(location = 2) in float point_size;
-    glEnableVertexAttribArray(2);
-    glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, sizeof(Vertex),
-                          reinterpret_cast<void *>(offsetof(Vertex, size)));
   }
 
   void PointCloud::draw() const
   {
     _shader_program.use();
 
-    // debug.
     Matrix4f mat;
 
     glMatrixMode(GL_PROJECTION);
+
+    // Create method for Shader program to set data to shader.
     glGetFloatv(GL_PROJECTION_MATRIX, mat.data());
-    glUniformMatrix4fv(glGetUniformLocation(_shader_program, "proj_mat"),
-                       1, GL_FALSE, mat.data());
+    auto proj_mat = glGetUniformLocation(_shader_program, "proj_mat");
+    if (GL_INVALID_VALUE == proj_mat || GL_INVALID_OPERATION == proj_mat)
+      throw runtime_error{ "Invalid shader program" };
+    glUniformMatrix4fv(proj_mat, 1, GL_FALSE, mat.data());
 
     glMatrixMode(GL_MODELVIEW);
     glGetFloatv(GL_MODELVIEW_MATRIX, mat.data());
-    glUniformMatrix4fv(glGetUniformLocation(_shader_program, "modelview_mat"),
-                       1, GL_FALSE, mat.data());
-    cout << mat << endl;
+    auto modelview_mat = glGetUniformLocation(_shader_program, "modelview_mat");
+    if (GL_INVALID_VALUE == modelview_mat || GL_INVALID_OPERATION == modelview_mat)
+      throw runtime_error{ "Invalid shader program" };
+    glUniformMatrix4fv(modelview_mat, 1, GL_FALSE, mat.data());
 
+    glBindBuffer(GL_ARRAY_BUFFER, _vbo);
     glBindVertexArray(_vao);
     glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
+                          reinterpret_cast<void *>(offsetof(Vertex, point)));
     glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
+                          reinterpret_cast<void *>(offsetof(Vertex, color)));
     glEnableVertexAttribArray(2);
+    glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, sizeof(Vertex),
+                          reinterpret_cast<void *>(offsetof(Vertex, size)));
+
+    glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
     glDrawArrays(GL_POINTS, 0, _vertices.size());
 
     _shader_program.use(false);
