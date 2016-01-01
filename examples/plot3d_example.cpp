@@ -5,18 +5,14 @@
 #include <DO/Kalpana.hpp>
 
 
-int main(int argc, char **argv)
+void build_scene(DO::Kalpana::Scene& scene)
 {
   using namespace std;
   using namespace DO::Kalpana;
 
-  QApplication app{ argc, argv };
-
   vector<Vector3f> points;
   for (int i = -10; i < 10; ++i)
     points.push_back(Vector3f(i, i, i));
-
-  Scene scene{};
 
   auto point_cloud = scene.scatter(points);
 
@@ -46,9 +42,18 @@ int main(int argc, char **argv)
 
   point_cloud->set_vertex_shader_source(vertex_shader);
   point_cloud->set_fragment_shader_source(fragment_shader);
+}
 
 
-  // Put this in Canvas3D::paintEvent()
+int main(int argc, char **argv)
+{
+  using namespace DO::Kalpana;
+
+  QApplication app{ argc, argv };
+
+  Scene scene{};
+  build_scene(scene);
+
   Canvas3D ax{ &scene };
   ax.resize(320, 240);
   ax.show();

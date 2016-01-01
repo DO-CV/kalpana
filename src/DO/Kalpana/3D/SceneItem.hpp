@@ -2,9 +2,9 @@
 
 #include <vector>
 
-#include <GL/gl.h>
-
 #include <Eigen/Core>
+
+#include <QOpenGLFunctions_4_3_Core>
 
 #include <DO/Kalpana/3D/Shader.hpp>
 #include <DO/Kalpana/3D.hpp>
@@ -15,7 +15,7 @@ namespace DO { namespace Kalpana {
   using namespace Eigen;
 
 
-  class SceneItem
+  class SceneItem : protected QOpenGLFunctions_4_3_Core
   {
   public:
     SceneItem() = default;
@@ -34,7 +34,7 @@ namespace DO { namespace Kalpana {
 
     virtual void initialize() = 0;
 
-    virtual void draw() const = 0;
+    virtual void draw() = 0;
     //! @}
 
   protected:
@@ -79,7 +79,7 @@ namespace DO { namespace Kalpana {
     //! @brief Must be called within an OpengL context.
     void initialize() override;
 
-    void draw() const override;
+    void draw() override;
     //! @}
 
   private:

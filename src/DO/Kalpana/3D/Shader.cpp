@@ -156,7 +156,7 @@ namespace DO { namespace Kalpana {
     }
   }
 
-  void ShaderProgram::use(bool on) const
+  void ShaderProgram::use(bool on)
   {
     if (on)
       glUseProgram(_program_object);

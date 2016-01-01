@@ -1,4 +1,5 @@
-#pragma once
+#ifndef DO_KALPANA_MATH_PROJECTION_HPP
+#define DO_KALPANA_MATH_PROJECTION_HPP
 
 #include <Eigen/Core>
 
@@ -22,3 +23,6 @@ namespace DO { namespace Kalpana {
 
 } /* namespace Kalpana */
 } /* namespace DO */
+
+
+#endif /* DO_KALPANA_MATH_PROJECTION_HPP */

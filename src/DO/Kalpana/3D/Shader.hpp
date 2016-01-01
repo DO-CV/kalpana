@@ -2,12 +2,12 @@
 
 #include <string>
 
-#include <GL/gl.h>
+#include <QOpenGLFunctions_4_3_Core>
 
 
 namespace DO { namespace Kalpana {
 
-  class Shader
+  class Shader : protected QOpenGLFunctions_4_3_Core
   {
   public:
     Shader() = default;
@@ -28,7 +28,7 @@ namespace DO { namespace Kalpana {
     GLuint _shader_object{ 0 };
   };
 
-  class ShaderProgram
+  class ShaderProgram : protected QOpenGLFunctions_4_3_Core
   {
   public:
     ShaderProgram() = default;
@@ -43,7 +43,7 @@ namespace DO { namespace Kalpana {
 
     void detach();
 
-    void use(bool on = true) const;
+    void use(bool on = true);
 
   protected:
     void create();

@@ -40,29 +40,30 @@ namespace DO { namespace Kalpana {
 
     glShadeModel(GL_SMOOTH);  // Enable smooth shading
 
+    // @TODO: create ambient light class.
     // Set up the cosmic background radiation.
-    glEnable(GL_LIGHTING);    // Enable lighting
-    GLfloat ambientLight[] = { 0.2f, 0.2f, 0.2f, 1.0f };
-    glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambientLight);
+    glEnable(GL_LIGHTING);
+    GLfloat ambient_light[] = { 0.2f, 0.2f, 0.2f, 1.0f };
+    glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambient_light);
 
-    // Set up light source 0
-    GLfloat light0Pos[]      = { 0.0f, 0.0f, 10.0f, 1.0f };
-    GLfloat light0SpotDir[]  = { 0.0f, 0.0f,-1.0f, 1.0f };
-    GLfloat diffuseLight0[]  = { 0.8f, 0.5f, 0.5f, 0.8f };
-    GLfloat specularLight0[] = { 1.0f, 1.0f, 0.0f, 1.0f };
-    glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuseLight0);
-    glLightfv(GL_LIGHT0, GL_SPECULAR, specularLight0);
-    glLightfv(GL_LIGHT0, GL_POSITION, light0Pos);
-    glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION, light0SpotDir);
+    // @TODO: create light class.
+    // Set up light source 0.
+    GLfloat light0_pos[]      = { 0.0f, 0.0f, 10.0f, 1.0f };
+    GLfloat light0_spot_dir[]  = { 0.0f, 0.0f,-1.0f, 1.0f };
+    GLfloat light0_diffuse[]  = { 0.8f, 0.5f, 0.5f, 0.8f };
+    GLfloat light0_specular[] = { 1.0f, 1.0f, 0.0f, 1.0f };
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, light0_diffuse);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, light0_specular);
+    glLightfv(GL_LIGHT0, GL_POSITION, light0_pos);
+    glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION, light0_spot_dir);
     glEnable(GL_LIGHT0);
 
-    // Set up color material
+    // Set up color material.
     glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
     glColorMaterial(GL_FRONT_AND_BACK, GL_SPECULAR);
     glMateriali(GL_FRONT_AND_BACK, GL_SHININESS, 100);
     glEnable(GL_COLOR_MATERIAL);
 
-    // ?
     glEnable(GL_MULTISAMPLE);
 
     // Normalize the vector for the lighting

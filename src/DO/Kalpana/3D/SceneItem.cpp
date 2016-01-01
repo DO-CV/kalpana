@@ -1,8 +1,5 @@
 #include <iostream>
 
-#include <QtOpenGL>
-#include <QtOpenGLExtensions>
-
 #include <DO/Kalpana/3D.hpp>
 
 
@@ -87,7 +84,7 @@ namespace DO { namespace Kalpana {
                           reinterpret_cast<void *>(offsetof(Vertex, size)));
   }
 
-  void PointCloud::draw() const
+  void PointCloud::draw()
   {
     _shader_program.use();
 
@@ -103,13 +100,12 @@ namespace DO { namespace Kalpana {
     glGetFloatv(GL_MODELVIEW_MATRIX, mat.data());
     glUniformMatrix4fv(glGetUniformLocation(_shader_program, "modelview_mat"),
                        1, GL_FALSE, mat.data());
-    cout << mat << endl;
 
     glBindVertexArray(_vao);
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
     glEnableVertexAttribArray(2);
-    glDrawArrays(GL_POINTS, 0, _vertices.size());
+    glDrawArrays(GL_POINTS, 0, static_cast<GLsizei>(_vertices.size()));
 
     _shader_program.use(false);
   }
