@@ -106,7 +106,7 @@ namespace DO { namespace Kalpana {
                           reinterpret_cast<void *>(offsetof(Vertex, size)));
 
     glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
-    glDrawArrays(GL_POINTS, 0, _vertices.size());
+    glDrawArrays(GL_POINTS, 0, static_cast<GLsizei>(_vertices.size()));
 
     _shader_program.use(false);
   }
