@@ -73,7 +73,7 @@ namespace DO { namespace Kalpana {
     QPoint m_lastPos;
 
     //! Rendering parameters.
-    Vector4f m_backgroundColor{ 0.72f, 0.655f, 0.886f, 1.0f };
+    Vector4f m_backgroundColor{ 0.72f, 0.655f, 0.886f, .5f };
   };
 
 } /* namespace Kalpana */
