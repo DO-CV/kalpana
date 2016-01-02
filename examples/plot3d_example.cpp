@@ -51,11 +51,18 @@ int main(int argc, char **argv)
 
   QApplication app{ argc, argv };
 
+  QSurfaceFormat format;
+  format.setDepthBufferSize(24);
+  format.setStencilBufferSize(8);
+  format.setVersion(4, 3);
+  format.setProfile(QSurfaceFormat::CoreProfile);
+
   Scene scene{};
   build_scene(scene);
 
   Canvas3D ax{ &scene };
   ax.resize(320, 240);
+  ax.setFormat(format);
   ax.show();
 
   return app.exec();

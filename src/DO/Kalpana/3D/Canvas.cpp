@@ -34,6 +34,8 @@ namespace DO { namespace Kalpana {
 
   void Canvas3D::initializeGL()
   {
+    initializeOpenGLFunctions();
+
     // Set background color
     glClearColor(m_backgroundColor[0], m_backgroundColor[1],
                  m_backgroundColor[2], m_backgroundColor[3]);

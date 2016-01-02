@@ -15,6 +15,7 @@
 #define DO_KALPANA_3D_CANVAS_HPP
 
 #include <QOpenGLWidget>
+#include <QOpenGLFunctions>
 
 #include <Eigen/Core>
 
@@ -28,8 +29,8 @@ namespace DO { namespace Kalpana {
 
   using namespace Eigen;
 
-  //! @brief QGLWidget-derived class used to view 3D scenes.
-  class Canvas3D : public QOpenGLWidget
+  //! @brief Class derived from QOpenGLWidget to view 3D scenes.
+  class Canvas3D : public QOpenGLWidget, protected QOpenGLFunctions
   {
   public:
     Canvas3D(Scene *scene, QWidget* parent = 0);
@@ -57,8 +58,8 @@ namespace DO { namespace Kalpana {
     QPointF normalizePos(const QPointF& localPos) const;
 
   private:
-    //! Modelview parameters.
-    GLfloat m_scale{ 1.0f };
+    //! Model-view parameters.
+    float m_scale{ 1.0f };
     Vector3f m_center;
 
     //! World coordinate frame.
