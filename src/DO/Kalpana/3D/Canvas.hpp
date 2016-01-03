@@ -1,6 +1,5 @@
 // ========================================================================== //
-// This file is part of DO-CV, a basic set of libraries in C++ for computer
-// vision.
+// This file is part of Kalpana.
 //
 // Copyright (C) 2015 David Ok <david.ok8@gmail.com>
 //
@@ -30,10 +29,10 @@ namespace DO { namespace Kalpana {
   using namespace Eigen;
 
   //! @brief Class derived from QOpenGLWidget to view 3D scenes.
-  class Canvas3D : public QOpenGLWidget, protected QOpenGLFunctions
+  class Canvas3D : public QOpenGLWidget, protected QOpenGLFunctions_4_3_Core
   {
   public:
-    Canvas3D(Scene *scene, QWidget* parent = 0);
+    Canvas3D(Scene *scene, QWidget *parent = 0);
 
     void render3DScene();
     void renderTextOverlay();
@@ -51,8 +50,6 @@ namespace DO { namespace Kalpana {
     void wheelEvent(QWheelEvent *event);
 
     void keyPressEvent(QKeyEvent *event);
-
-    void closeEvent(QCloseEvent *event);
 
   protected:
     QPointF normalizePos(const QPointF& localPos) const;

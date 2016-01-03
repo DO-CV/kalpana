@@ -19,6 +19,8 @@ namespace DO { namespace Kalpana {
 
   void Shader::create_from_source(GLenum shader_type, const std::string& source)
   {
+    initializeOpenGLFunctions();
+
     clear();
 
     _shader_type = shader_type;
@@ -91,6 +93,7 @@ namespace DO { namespace Kalpana {
     }
   }
 
+
   ShaderProgram::~ShaderProgram()
   {
     detach();
@@ -100,6 +103,8 @@ namespace DO { namespace Kalpana {
   void ShaderProgram::attach(const Shader& vertex_shader,
                              const Shader& fragment_shader)
   {
+    initializeOpenGLFunctions();
+
     create();
 
     glAttachShader(_program_object, vertex_shader);

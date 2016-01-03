@@ -1,6 +1,5 @@
 // ========================================================================== //
-// This file is part of DO-CV, a basic set of libraries in C++ for computer
-// vision.
+// This file is part of Kalpana.
 //
 // Copyright (C) 2015 David Ok <david.ok8@gmail.com>
 //
@@ -24,7 +23,7 @@ using namespace std;
 
 namespace DO { namespace Kalpana {
 
-  Canvas3D::Canvas3D(Scene *scene, QWidget* parent)
+  Canvas3D::Canvas3D(Scene *scene, QWidget *parent)
     : QOpenGLWidget{ parent }
     , m_scene{ scene }
   {
@@ -253,16 +252,6 @@ namespace DO { namespace Kalpana {
     {
       m_displayFrame=!m_displayFrame;
       update();
-    }
-  }
-
-  void Canvas3D::closeEvent(QCloseEvent *event)
-  {
-    if(event->spontaneous())
-    {
-      qWarning() << "\n\nWarning: you closed a window unexpectedly!\n\n";
-      qWarning() << "Graphical application is terminating...";
-      qApp->exit(0);
     }
   }
 

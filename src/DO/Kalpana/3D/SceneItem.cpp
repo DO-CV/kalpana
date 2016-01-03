@@ -57,6 +57,8 @@ namespace DO { namespace Kalpana {
 
   void PointCloud::initialize()
   {
+    initializeOpenGLFunctions();
+
     clear();
     initialize_shaders();
 

@@ -1,6 +1,5 @@
 // ========================================================================== //
-// This file is part of DO-CV, a basic set of libraries in C++ for computer
-// vision.
+// This file is part of Kalpana.
 //
 // Copyright (C) 2015 David Ok <david.ok8@gmail.com>
 //
@@ -15,7 +14,7 @@
 #include <QtOpenGL>
 
 
-struct GLUquadric;
+class GLUquadric;
 
 
 namespace DO { namespace Kalpana {
