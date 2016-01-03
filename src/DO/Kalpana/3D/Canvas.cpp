@@ -33,6 +33,9 @@ namespace DO { namespace Kalpana {
 
   void Canvas3D::initializeGL()
   {
+    // TODO!
+    //connect(context(), &QOpenGLContext::aboutToBeDestroyed, this, &GLWidget::cleanup);
+
     initializeOpenGLFunctions();
 
     // Set background color

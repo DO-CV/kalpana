@@ -103,7 +103,6 @@ namespace DO { namespace Kalpana {
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
                           reinterpret_cast<void *>(offsetof(Vertex, color)));
     glEnableVertexAttribArray(2);
-    glDrawArrays(GL_POINTS, 0, static_cast<GLsizei>(_vertices.size()));
     glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, sizeof(Vertex),
                           reinterpret_cast<void *>(offsetof(Vertex, size)));
 

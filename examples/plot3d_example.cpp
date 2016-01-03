@@ -1,4 +1,4 @@
-#include <map>
+#include <iostream>
 
 #include <QApplication>
 
@@ -27,17 +27,26 @@ void build_scene(DO::Kalpana::Scene& scene)
     layout(location = 1) in vec3 color;
     layout(location = 2) in float size;
 
+    out vec4 color_;
+
     void main(void)
     {
       gl_Position = proj_mat * modelview_mat * vec4(position, 1.0);
-      //gl_Color = vec4(color, 1.0);
       gl_PointSize = abs(position[2]);
+
+      color_ = vec4(color, 1.0);
     })" };
 
   auto fragment_shader = string{ R"(
+    #version 450
+
+    in vec4 color_;
+
+    out vec4 frag_color;
+
     void main(void)
     {
-      gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+      frag_color = color_;
     })" };
 
   point_cloud->set_vertex_shader_source(vertex_shader);
@@ -47,6 +56,7 @@ void build_scene(DO::Kalpana::Scene& scene)
 
 int main(int argc, char **argv)
 {
+  using namespace std;
   using namespace DO::Kalpana;
 
   QApplication app{ argc, argv };
@@ -55,8 +65,15 @@ int main(int argc, char **argv)
   build_scene(scene);
 
   Canvas3D ax{ &scene };
-  ax.resize(320, 240);
-  ax.show();
+
+  try {
+    ax.resize(320, 240);
+    ax.show();
+  }
+  catch (exception& e)
+  {
+    cout << e.what() << endl;
+  }
 
   return app.exec();
 }
