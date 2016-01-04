@@ -27,26 +27,24 @@ void build_scene(DO::Kalpana::Scene& scene)
     layout(location = 1) in vec3 color;
     layout(location = 2) in float size;
 
-    out vec4 color_;
+    out vec4 vert_color;
 
     void main(void)
     {
       gl_Position = proj_mat * modelview_mat * vec4(position, 1.0);
       gl_PointSize = abs(position[2]);
-
-      color_ = vec4(color, 1.0);
+      vert_color = vec4(color, 1.0);
     })" };
 
   auto fragment_shader = string{ R"(
     #version 450
 
-    in vec4 color_;
-
+    in vec4 vert_color;
     out vec4 frag_color;
 
     void main(void)
     {
-      frag_color = color_;
+      frag_color = vert_color;
     })" };
 
   point_cloud->set_vertex_shader_source(vertex_shader);

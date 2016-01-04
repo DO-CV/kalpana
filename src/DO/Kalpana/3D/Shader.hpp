@@ -45,6 +45,8 @@ namespace DO { namespace Kalpana {
 
     void use(bool on = true);
 
+    void set_uniform_matrix4f(const char *mat_name, const float* mat_coeffs);
+
   protected:
     void create();
 

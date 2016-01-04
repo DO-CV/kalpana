@@ -82,17 +82,11 @@ namespace DO { namespace Kalpana {
 
     // Create method for Shader program to set data to shader.
     glGetFloatv(GL_PROJECTION_MATRIX, mat.data());
-    auto proj_mat = glGetUniformLocation(_shader_program, "proj_mat");
-    if (GL_INVALID_VALUE == proj_mat || GL_INVALID_OPERATION == proj_mat)
-      throw runtime_error{ "Invalid shader program" };
-    glUniformMatrix4fv(proj_mat, 1, GL_FALSE, mat.data());
+    _shader_program.set_uniform_matrix4f("proj_mat", mat.data());
 
     glMatrixMode(GL_MODELVIEW);
     glGetFloatv(GL_MODELVIEW_MATRIX, mat.data());
-    auto modelview_mat = glGetUniformLocation(_shader_program, "modelview_mat");
-    if (GL_INVALID_VALUE == modelview_mat || GL_INVALID_OPERATION == modelview_mat)
-      throw runtime_error{ "Invalid shader program" };
-    glUniformMatrix4fv(modelview_mat, 1, GL_FALSE, mat.data());
+    _shader_program.set_uniform_matrix4f("modelview_mat", mat.data());
 
     glBindBuffer(GL_ARRAY_BUFFER, _vbo);
     glBindVertexArray(_vao);
@@ -107,7 +101,11 @@ namespace DO { namespace Kalpana {
                           reinterpret_cast<void *>(offsetof(Vertex, size)));
 
     glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
+    glEnable(GL_POINT_SMOOTH);
     glDrawArrays(GL_POINTS, 0, static_cast<GLsizei>(_vertices.size()));
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
 
     _shader_program.use(false);
   }

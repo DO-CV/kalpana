@@ -128,7 +128,7 @@ namespace DO { namespace Kalpana {
       log.resize(log_sz);
 
       throw std::runtime_error{
-        Sara::format("Failed to link shader program: %d"
+        Sara::format("Failed to link shader program: %d.\n"
                      "Linkage log:\n%s", success, log.data())
       };
     }
@@ -146,7 +146,7 @@ namespace DO { namespace Kalpana {
       log.resize(log_sz);
 
       throw std::runtime_error{
-        Sara::format("Failed to link shader program: %d"
+        Sara::format("Failed to link shader program: %d\n"
                      "Linkage log:\n%s", success, log.data())
       };
     }
@@ -171,6 +171,8 @@ namespace DO { namespace Kalpana {
 
   void ShaderProgram::create()
   {
+    initializeOpenGLFunctions();
+
     if (!_program_object)
       _program_object = glCreateProgram();
 
@@ -209,6 +211,16 @@ namespace DO { namespace Kalpana {
 
       _program_object = 0;
     }
+  }
+
+  void ShaderProgram::set_uniform_matrix4f(const char *mat_name,
+                                           const float *mat_coeffs)
+  {
+    auto mat_location = glGetUniformLocation(_program_object, mat_name);
+    if (GL_INVALID_VALUE == mat_location ||
+        GL_INVALID_OPERATION == mat_location)
+      throw std::runtime_error{ "Invalid shader program" };
+    glUniformMatrix4fv(mat_location, 1, GL_FALSE, mat_coeffs);
   }
 
 } /* namespace Kalpana */

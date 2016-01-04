@@ -9,7 +9,7 @@ namespace DO { namespace Kalpana {
   PointCloud * Scene::scatter(const vector<Vector3f>& points)
   {
     auto colors = vector<Vector3f>(points.size(), Vector3f::Ones());
-    auto sizes = vector<float>(points.size(), 5.f);
+    auto sizes = vector<float>(points.size(), 10.f);
 
     unique_ptr<SceneItem> point_cloud{ new PointCloud{ points, colors, sizes } };
 
