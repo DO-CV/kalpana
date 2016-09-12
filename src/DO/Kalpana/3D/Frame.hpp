@@ -8,8 +8,8 @@
 // you can obtain one at http://mozilla.org/MPL/2.0/.
 // ========================================================================== //
 
-#ifndef DO_SARA_GRAPHICS_FRAME_HPP
-#define DO_SARA_GRAPHICS_FRAME_HPP
+#ifndef DO_KALPANA_GRAPHICS_FRAME_HPP
+#define DO_KALPANA_GRAPHICS_FRAME_HPP
 
 #include <QtOpenGL>
 
@@ -50,4 +50,4 @@ namespace DO { namespace Kalpana {
 } /* namespace DO */
 
 
-#endif /* DO_SARA_GRAPHICS_FRAME_HPP */
+#endif /* DO_KALPANA_GRAPHICS_FRAME_HPP */

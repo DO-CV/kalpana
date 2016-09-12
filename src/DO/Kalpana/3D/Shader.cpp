@@ -17,7 +17,7 @@ namespace DO { namespace Kalpana {
     clear();
   }
 
-  void Shader::create_from_source(GLenum shader_type, const std::string& source)
+  bool Shader::create_from_source(GLenum shader_type, const std::string& source)
   {
     initializeOpenGLFunctions();
 
@@ -39,6 +39,7 @@ namespace DO { namespace Kalpana {
     auto log = string{};
 
     glGetShaderiv(_shader_object, GL_COMPILE_STATUS, &success);
+
     if (!success)
     {
       glGetShaderiv(_shader_object, GL_INFO_LOG_LENGTH, &log_max_sz);
@@ -46,24 +47,27 @@ namespace DO { namespace Kalpana {
       glGetShaderInfoLog(_shader_object, log_max_sz, &log_sz, &log[0]);
       log.resize(log_sz);
 
-      throw runtime_error{
-        Sara::format("Error: failed to create shader from source:\n"
-                     "%s.\n"
-                     "Compilation log:\n"
-                     "%s",
-                     source.c_str(), log.c_str())
-      };
+      std::cerr << Sara::format("Error: failed to create shader from source:\n"
+                                "%s.\n"
+                                "Compilation log:\n"
+                                "%s",
+                                source.c_str(), log.c_str()) << std::endl;
+      return false;
     }
+
+    return true;
   }
 
-  void Shader::create_from_file(GLenum shader_type, const std::string& filepath)
+  bool Shader::create_from_file(GLenum shader_type, const std::string& filepath)
   {
     // Read source fle.
-    std::ifstream file(filepath.c_str());
+    std::ifstream file{ filepath.c_str() };
     if (!file.is_open())
-      throw std::runtime_error{ Sara::format(
-          "Error: cannot open file: %s", filepath.c_str())
-      };
+    {
+      std::cerr << Sara::format("Error: cannot open file: %s", filepath.c_str())
+                << std::endl;
+      return false;
+    }
 
     auto source = std::string{};
     file.seekg(0, std::ios::end);
@@ -73,10 +77,10 @@ namespace DO { namespace Kalpana {
     source.assign(std::istreambuf_iterator<char>(file),
                   std::istreambuf_iterator<char>());
 
-    create_from_source(shader_type, source);
+    return create_from_source(shader_type, source);
   }
 
-  void Shader::clear()
+  bool Shader::clear()
   {
     if (_shader_object)
     {
@@ -85,12 +89,16 @@ namespace DO { namespace Kalpana {
       auto success = GLint{};
       glGetShaderiv(_shader_object, GL_DELETE_STATUS, &success);
       if (!success)
-        throw std::runtime_error{
-        Sara::format("Error: failed to delete shader: %d.", success)
-      };
+      {
+        std::cerr << Sara::format("Error: failed to delete shader: %d.",
+                                  success) << std::endl;
+        return false;
+      }
 
       _shader_object = 0;
     }
+
+    return true;
   }
 
 
@@ -100,12 +108,13 @@ namespace DO { namespace Kalpana {
     clear();
   }
 
-  void ShaderProgram::attach(const Shader& vertex_shader,
+  bool ShaderProgram::attach(const Shader& vertex_shader,
                              const Shader& fragment_shader)
   {
     initializeOpenGLFunctions();
 
-    create();
+    if (!create())
+      return false;
 
     glAttachShader(_program_object, vertex_shader);
     glAttachShader(_program_object, fragment_shader);
@@ -127,10 +136,10 @@ namespace DO { namespace Kalpana {
       glGetProgramInfoLog(_program_object, log_max_sz, &log_sz, &log[0]);
       log.resize(log_sz);
 
-      throw std::runtime_error{
-        Sara::format("Failed to link shader program: %d.\n"
-                     "Linkage log:\n%s", success, log.data())
-      };
+      std::cerr << Sara::format("Failed to link shader program: %d.\n"
+                                "Linkage log:\n%s",
+                                success, log.data()) << std::endl;
+      return false;
     }
 
     glValidateProgram(_program_object);
@@ -145,23 +154,27 @@ namespace DO { namespace Kalpana {
       glGetProgramInfoLog(_program_object, log_max_sz, &log_sz, &log[0]);
       log.resize(log_sz);
 
-      throw std::runtime_error{
-        Sara::format("Failed to link shader program: %d\n"
-                     "Linkage log:\n%s", success, log.data())
-      };
+      std::cerr << Sara::format("Failed to link shader program: %d\n"
+                                "Linkage log:\n%s",
+                                success, log.data()) << std::endl;
+      return false;
     }
+
+    return true;
   }
 
-  void ShaderProgram::detach()
+  bool ShaderProgram::detach()
   {
     if (_program_object)
     {
       glDetachShader(_program_object, _vertex_shader);
       glDetachShader(_program_object, _fragment_shader);
     }
+
+    return true;
   }
 
-  void ShaderProgram::use(bool on)
+  bool ShaderProgram::use(bool on)
   {
     if (on)
       glUseProgram(_program_object);
@@ -169,7 +182,7 @@ namespace DO { namespace Kalpana {
       glUseProgram(0);
   }
 
-  void ShaderProgram::create()
+  bool ShaderProgram::create()
   {
     initializeOpenGLFunctions();
 
@@ -177,50 +190,63 @@ namespace DO { namespace Kalpana {
       _program_object = glCreateProgram();
 
     if (!_program_object)
-      throw std::runtime_error{ "Failed to create shader program!" };
-  }
-
-  void ShaderProgram::clear()
-  {
-    if (_program_object)
     {
-      glDeleteProgram(_program_object);
-      auto success = GLint{};
-      glGetProgramiv(_program_object, GL_DELETE_STATUS, &success);
-
-      if (!success)
-      {
-        glValidateProgram(_program_object);
-
-        auto log_max_sz = GLint{ 0 };
-        auto log_sz = GLsizei{ 0 };
-        auto log = std::string{};
-
-        glGetProgramiv(_program_object, GL_INFO_LOG_LENGTH, &log_max_sz);
-
-        log.resize(log_max_sz);
-        glGetProgramInfoLog(_program_object, log_max_sz, &log_sz, &log[0]);
-        log.resize(log_sz);
-
-        throw std::runtime_error{ Sara::format(
-            "Failed to delete shader program: %d.\n"
-            "Deletion log:\n%s",
-            success, log.data())
-        };
-      }
-
-      _program_object = 0;
+      std::cerr << "Failed to create shader program!" << std::endl;
+      return false;
     }
+
+    return true;
   }
 
-  void ShaderProgram::set_uniform_matrix4f(const char *mat_name,
+  bool ShaderProgram::clear()
+  {
+    if (!_program_object)
+      return true;
+
+    glDeleteProgram(_program_object);
+    auto success = GLint{};
+    glGetProgramiv(_program_object, GL_DELETE_STATUS, &success);
+
+    if (!success)
+    {
+      glValidateProgram(_program_object);
+
+      auto log_max_sz = GLint{ 0 };
+      auto log_sz = GLsizei{ 0 };
+      auto log = std::string{};
+
+      glGetProgramiv(_program_object, GL_INFO_LOG_LENGTH, &log_max_sz);
+
+      log.resize(log_max_sz);
+      glGetProgramInfoLog(_program_object, log_max_sz, &log_sz, &log[0]);
+      log.resize(log_sz);
+
+      std::cerr << Sara::format("Failed to delete shader program: %d.\n"
+                                "Deletion log:\n%s",
+                                success, log.data()) << std::endl;
+
+      return false;
+    }
+
+    _program_object = 0;
+
+    return true;
+  }
+
+  bool ShaderProgram::set_uniform_matrix4f(const char *mat_name,
                                            const float *mat_coeffs)
   {
     auto mat_location = glGetUniformLocation(_program_object, mat_name);
     if (GL_INVALID_VALUE == mat_location ||
         GL_INVALID_OPERATION == mat_location)
-      throw std::runtime_error{ "Invalid shader program" };
+    {
+      std::cerr << "Invalid shader program" << std::endl;
+      return false;
+    }
+
     glUniformMatrix4fv(mat_location, 1, GL_FALSE, mat_coeffs);
+
+    return true;
   }
 
 } /* namespace Kalpana */

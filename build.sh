@@ -6,6 +6,7 @@ fi
 cd ../kalpana-build
 
 cmake ../kalpana \
+  -DCMAKE_PREFIX_PATH=/usr/VisualRecognition \
   -DCMAKE_BUILD_TYPE=Release \
   -DKALPANA_BUILD_SAMPLES=ON
 

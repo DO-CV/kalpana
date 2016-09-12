@@ -64,14 +64,8 @@ int main(int argc, char **argv)
 
   Canvas3D ax{ &scene };
 
-  try {
-    ax.resize(320, 240);
-    ax.show();
-  }
-  catch (exception& e)
-  {
-    cout << e.what() << endl;
-  }
+  ax.resize(320, 240);
+  ax.show();
 
   return app.exec();
 }

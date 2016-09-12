@@ -16,12 +16,12 @@ namespace DO { namespace Kalpana {
 
     operator GLuint() const { return _shader_object; }
 
-    void create_from_source(GLenum shader_type, const std::string& source);
+    bool create_from_source(GLenum shader_type, const std::string& source);
 
-    void create_from_file(GLenum shader_type, const std::string& filepath);
+    bool create_from_file(GLenum shader_type, const std::string& filepath);
 
   private:
-    void clear();
+    bool clear();
 
   private:
     GLenum _shader_type;
@@ -31,7 +31,7 @@ namespace DO { namespace Kalpana {
   class ShaderProgram : protected QOpenGLFunctions_4_3_Core
   {
   public:
-    ShaderProgram() = default;
+    inline ShaderProgram() = default;
 
     ShaderProgram(const Shader& vertex_shader, const Shader& fragment_shader);
 
@@ -39,18 +39,18 @@ namespace DO { namespace Kalpana {
 
     operator GLuint() const { return _program_object; }
 
-    void attach(const Shader& vertex_shader, const Shader& fragment_shader);
+    bool attach(const Shader& vertex_shader, const Shader& fragment_shader);
 
-    void detach();
+    bool detach();
 
-    void use(bool on = true);
+    bool use(bool on = true);
 
-    void set_uniform_matrix4f(const char *mat_name, const float* mat_coeffs);
+    bool set_uniform_matrix4f(const char *mat_name, const float* mat_coeffs);
 
   protected:
-    void create();
+    bool create();
 
-    void clear();
+    bool clear();
 
   private:
     GLuint _program_object{ 0 };
